@@ -1,0 +1,10 @@
+[
+  { "id": "artwork1", "image": "duwende.jpg", "sound": "duwende sound.mp3" },
+  { "id": "artwork2", "image": "kapre.jpg", "sound": "kapre sound.mp3" },
+  { "id": "artwork3", "image": "manananggal.png", "sound": "Manananggal Sounds.mp3" },
+  { "id": "artwork4", "image": "serenaa.jpg", "sound": "serena sound.mp3" },
+  { "id": "artwork5", "image": "tikbalang.jpg", "sound": "Tikbalang sounds.mp3" },
+  { "id": "artwork6", "image": "tiyanak.jpg", "sound": "tiyanak sound.mp3" },
+  { "id": "artwork7", "image": "white lady.jpg", "sound": "white lady sound.mp3" }
+]
+

@@ -1,0 +1,2078 @@
+<!DOCTYPE html>
+<!-- 
+    NOTE!: This file must be opened through a local web server, not directly (file://).
+    To run this project:
+    1. use live server extension in vscode-->
+    
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini VR Art Gallery</title>
+    <!-- A-Frame v1.4.2 -->
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <!-- Debug script to check image loading -->
+    <script>
+        window.addEventListener('load', function() {
+            const scene = document.querySelector('a-scene');
+            if (scene.hasLoaded) {
+                console.log('Scene loaded');
+                // Check if images loaded
+                ['art1', 'art2', 'art3', 'art4', 'poster'].forEach(id => {
+                    const img = document.getElementById(id);
+                    if (img) {
+                        if (img.complete && img.naturalHeight !== 0) {
+                            console.log(`✓ ${id} loaded successfully`);
+                        } else {
+                            console.error(`✗ ${id} failed to load`);
+                            img.onerror = () => console.error(`Image ${id} error: Check file path and ensure you're using a local web server`);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <a-scene 
+        background="color: #0a0a0a"
+        fog="type: exponential; density: 0.035; color: #2a2a2a"
+        renderer="antialias: true; colorManagement: true; shadowMapEnabled: true"
+        loading-screen="dotsColor: #D4AF37; backgroundColor: #000000">
+        
+        <!-- Asset Management -->
+        <a-assets timeout="30000">
+            <!-- Artwork images for frames -->
+            <img id="art1" src="images/duwende.jpg" crossorigin="anonymous">
+            <img id="art2" src="images/kapre.jpg" crossorigin="anonymous">
+            <img id="art3" src="images/manananggal.png" crossorigin="anonymous">
+            <img id="art4" src="images/serenaa.jpg" crossorigin="anonymous">
+            <img id="art5" src="images/tikbalang.jpg" crossorigin="anonymous">
+            <img id="art6" src="images/tiyanak.jpg" crossorigin="anonymous">
+            <img id="art7" src="images/white%20lady.jpg" crossorigin="anonymous">
+            
+            <!-- Poster image for curved display -->
+            <img id="poster" src="images/banner.png" crossorigin="anonymous">
+            
+            <!-- Floor texture -->
+            <img id="floorTexture" src="https://cdn.aframe.io/link-traversal/thumbs/floor.jpg" crossorigin="anonymous">
+
+            <!-- Audio assets -->
+            <audio id="bgAudio" src="sound/background%20sound.mp3"></audio>
+            <audio id="duwendeSound" src="sound/duwende%20sound.mp3"></audio>
+            <audio id="kapreSound" src="sound/kapre%20sound.mp3"></audio>
+            <audio id="manananggalSound" src="sound/Manananggal%20Sounds.mp3"></audio>
+            <audio id="serenaaSound" src="sound/serena%20sound.mp3"></audio>
+            <audio id="tikbalangSound" src="sound/Tikbalang%20sounds.mp3"></audio>
+            <audio id="tiyanakSound" src="sound/tiyanak%20sound.mp3"></audio>
+            <audio id="whiteladySound" src="sound/white%20lady%20sound.mp3"></audio>
+            <audio id="educationalRap" src="sound/Filipino%20Mythical%20Creatures%20Rap.mp3"></audio>
+            
+            <!-- 3D Model assets -->
+            <a-asset-item id="witchModel" src="images/witch/scene.gltf"></a-asset-item>
+        </a-assets>
+
+        <!-- Horror Gallery Lighting Setup -->
+        <a-light type="ambient" color="#ffffff" intensity="0.05" id="ambientLight"></a-light>
+        
+        <!-- Main directional light -->
+        <a-light 
+            type="directional" 
+            position="0 7 3" 
+            color="#ffffff" 
+            intensity="0.08"
+            id="mainDirectional"
+            cast-shadow="true">
+        </a-light>
+        
+        <!-- Eerie lighting zones-->
+        <a-light 
+            type="point" 
+            position="-6 2 -6" 
+            color="#ff0000" 
+            intensity="0.15"
+            distance="5"
+            decay="3"
+            id="redLight1">
+        </a-light>
+        <a-light 
+            type="point" 
+            position="6 2 6" 
+            color="#00ff00" 
+            intensity="0.12"
+            distance="5"
+            decay="3"
+            id="greenLight1">
+        </a-light>
+        <a-light 
+            type="point" 
+            position="0 2 -7" 
+            color="#ff6600" 
+            intensity="0.1"
+            distance="4"
+            decay="3"
+            id="orangeLight1">
+        </a-light>
+        
+        <!-- Flickering -->
+        <a-light 
+            type="spot" 
+            position="-5.5 4.8 -5.5" 
+            target="#artwork1"
+            angle="25"
+            penumbra="0.8"
+            color="#FFF8E7" 
+            intensity="0.55"
+            distance="7"
+            decay="3"
+            id="spotlight1">
+        </a-light>
+        
+        <a-light 
+            type="spot" 
+            position="0 4.8 -5.5" 
+            target="#artwork2"
+            angle="25"
+            penumbra="0.8"
+            color="#FFF8E7" 
+            intensity="0.55"
+            distance="7"
+            decay="3"
+            id="spotlight2">
+        </a-light>
+        
+        <a-light 
+            type="spot" 
+            position="5.5 4.8 -5.5" 
+            target="#artwork3"
+            angle="25"
+            penumbra="0.8"
+            color="#ff6666" 
+            intensity="0.6"
+            distance="7"
+            decay="3"
+            id="spotlight3">
+        </a-light>
+        
+        <a-light 
+            type="spot" 
+            position="-6.5 4.8 -3.5" 
+            target="#artwork4"
+            angle="25"
+            penumbra="0.8"
+            color="#66ff66" 
+            intensity="0.5"
+            distance="7"
+            decay="3"
+            id="spotlight4">
+        </a-light>
+
+        <a-light 
+            type="spot" 
+            position="-6.5 4.8 3.5" 
+            target="#artwork5"
+            angle="25"
+            penumbra="0.8"
+            color="#FFF8E7" 
+            intensity="0.55"
+            distance="7"
+            decay="3"
+            id="spotlight5">
+        </a-light>
+
+        <a-light 
+            type="spot" 
+            position="6.5 4.8 -3.5" 
+            target="#artwork6"
+            angle="25"
+            penumbra="0.8"
+            color="#ff6666" 
+            intensity="0.5"
+            distance="7"
+            decay="3"
+            id="spotlight6">
+        </a-light>
+
+        <a-light 
+            type="spot" 
+            position="6.5 4.8 3.5" 
+            target="#artwork7"
+            angle="25"
+            penumbra="0.8"
+            color="#66ff66" 
+            intensity="0.55"
+            distance="7"
+            decay="3"
+            id="spotlight7">
+        </a-light>
+        
+        <a-light 
+            type="point" 
+            position="0 3.8 0" 
+            color="#FFF8E7" 
+            intensity="1.0"
+            distance="7"
+            decay="2">
+        </a-light>
+        
+        <!-- for ambiance -->
+        <a-light 
+            type="point" 
+            position="-2 4.5 0" 
+            color="#ffffff" 
+            intensity="0.4"
+            distance="8">
+        </a-light>
+        <a-light 
+            type="point" 
+            position="2 4.5 0" 
+            color="#ffffff" 
+            intensity="0.4"
+            distance="8">
+        </a-light>
+
+        <!-- Gallery Room Structure -->
+        <a-box 
+            id="room"
+            position="0 2.5 0"
+            width="16"
+            height="5.5"
+            depth="16"
+            material="color: #f0f0f0; side: double"
+            visible="false">
+        </a-box>
+
+        <!--floor -->
+        <a-plane 
+            id="floor"
+            position="0 0 0"
+            rotation="-90 0 0"
+            width="16"
+            height="16"
+            material="color: #E8E8E3; roughness: 0.1; metalness: 0.05"
+            shadow="receive: true">
+        </a-plane>
+        
+        <a-plane 
+            id="floorPattern"
+            position="0 0.001 0"
+            rotation="-90 0 0"
+            width="16"
+            height="16"
+            material="color: #D0D0CB; opacity: 0.15; transparent: true"
+            shadow="receive: false">
+        </a-plane>
+      
+        <a-box
+            id="floorTrim"
+            position="0 0.01 0"
+            width="16.2"
+            height="0.02"
+            depth="16.2"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.7"
+            shadow="receive: true">
+        </a-box>
+
+        <!--back wall-->
+        <a-plane 
+            id="backWall"
+            position="0 2.5 -8"
+            rotation="0 0 0"
+            width="16"
+            height="5.5"
+            material="color: #FAFAFA; roughness: 0.9; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        
+        <!-- baseboard-->
+        <a-box
+            id="backBaseboard"
+            position="0 0.1 -7.99"
+            width="16"
+            height="0.25"
+            depth="0.03"
+            material="color: #2C2C2C; roughness: 0.6">
+        </a-box>
+        <a-box
+            id="backBaseboardAccent"
+            position="0 0.22 -7.985"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <a-box
+            id="backMolding"
+            position="0 5.4 -7.99"
+            width="16"
+            height="0.25"
+            depth="0.06"
+            material="color: #F0F0F0; roughness: 0.7">
+        </a-box>
+        <a-box
+            id="backMoldingAccent"
+            position="0 5.38 -7.985"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <!-- columns on back wall -->
+        <a-cylinder
+            id="column1"
+            position="-6 0 0"
+            rotation="0 0 0"
+            radius="0.15"
+            height="5.5"
+            material="color: #F5F5F5; roughness: 0.8"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+        <a-cylinder
+            id="column2"
+            position="6 0 0"
+            rotation="0 0 0"
+            radius="0.15"
+            height="5.5"
+            material="color: #F5F5F5; roughness: 0.8"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+    
+        <a-cylinder
+            id="columnCap1"
+            position="-6 2.9 0"
+            rotation="0 0 0"
+            radius="0.18"
+            height="0.2"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.7">
+        </a-cylinder>
+        <a-cylinder
+            id="columnCap2"
+            position="6 2.9 0"
+            rotation="0 0 0"
+            radius="0.18"
+            height="0.2"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.7">
+        </a-cylinder>
+
+        <!-- left wall -->
+        <a-plane 
+            id="leftWall"
+            position="-8 2.75 0"
+            rotation="0 90 0"
+            width="16"
+            height="5.5"
+            scale="-1 1 1"
+            material="color: #FAFAFA; roughness: 0.9; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        
+        <!-- baseboard -->
+        <a-box
+            id="leftBaseboard"
+            position="-7.99 0.1 0"
+            rotation="0 90 0"
+            width="16"
+            height="0.25"
+            depth="0.03"
+            scale="-1 1 1"
+            material="color: #2C2C2C; roughness: 0.6">
+        </a-box>
+        <a-box
+            id="leftBaseboardAccent"
+            position="-7.985 0.22 0"
+            rotation="0 90 0"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            scale="-1 1 1"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <a-box
+            id="leftMolding"
+            position="-7.99 5.4 0"
+            rotation="0 90 0"
+            width="16"
+            height="0.25"
+            depth="0.06"
+            scale="-1 1 1"
+            material="color: #F0F0F0; roughness: 0.7">
+        </a-box>
+        <a-box
+            id="leftMoldingAccent"
+            position="-7.985 5.38 0"
+            rotation="0 90 0"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            scale="-1 1 1"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+
+        <!-- right wall -->
+        <a-plane 
+            id="rightWall"
+            position="8 2.75 0"
+            rotation="0 -90 0"
+            width="16"
+            height="5.5"
+            material="color: #FAFAFA; roughness: 0.9; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        
+        <a-box
+            id="rightBaseboard"
+            position="7.99 0.1 0"
+            rotation="0 -90 0"
+            width="16"
+            height="0.25"
+            depth="0.03"
+            material="color: #2C2C2C; roughness: 0.6">
+        </a-box>
+        <a-box
+            id="rightBaseboardAccent"
+            position="7.985 0.22 0"
+            rotation="0 -90 0"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <a-box
+            id="rightMolding"
+            position="7.99 5.4 0"
+            rotation="0 -90 0"
+            width="16"
+            height="0.25"
+            depth="0.06"
+            material="color: #F0F0F0; roughness: 0.7">
+        </a-box>
+        <a-box
+            id="rightMoldingAccent"
+            position="7.985 5.38 0"
+            rotation="0 -90 0"
+            width="16"
+            height="0.01"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+
+        <!--front Wall -->
+        <a-plane 
+            id="frontWallLeft"
+            position="-5 2.75 8"
+            rotation="0 180 0"
+            width="4.5"
+            height="5.5"
+            material="color: #FAFAFA; roughness: 0.9; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        <a-plane 
+            id="frontWallRight"
+            position="5 2.75 8"
+            rotation="0 180 0"
+            width="4.5"
+            height="5.5"
+            material="color: #FAFAFA; roughness: 0.9; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        
+        <a-cylinder
+            id="entranceColumn1"
+            position="-2.5 0 7.99"
+            rotation="0 0 0"
+            radius="0.12"
+            height="5.5"
+            material="color: #F5F5F5; roughness: 0.8"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+        <a-cylinder
+            id="entranceColumn2"
+            position="2.5 0 7.99"
+            rotation="0 0 0"
+            radius="0.12"
+            height="5.5"
+            material="color: #F5F5F5; roughness: 0.8"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+        <!-- Column capitals -->
+        <a-cylinder
+            id="entranceCap1"
+            position="-2.5 3.1 7.99"
+            rotation="0 0 0"
+            radius="0.15"
+            height="0.2"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.7">
+        </a-cylinder>
+        <a-cylinder
+            id="entranceCap2"
+            position="2.5 3.1 7.99"
+            rotation="0 0 0"
+            radius="0.15"
+            height="0.2"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.7">
+        </a-cylinder>
+        
+        <a-box
+            id="entranceLintel"
+            position="0 5.4 7.99"
+            width="7"
+            height="0.22"
+            depth="0.1"
+            material="color: #F0F0F0; roughness: 0.7">
+        </a-box>
+        <a-box
+            id="entranceLintelAccent"
+            position="0 5.38 7.99"
+            width="7.1"
+            height="0.02"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+
+        <!-- ceiling-->
+        <a-plane 
+            id="ceiling"
+            position="0 5.5 0"
+            rotation="90 0 0"
+            width="16"
+            height="16"
+            material="color: #2a2a2a; roughness: 0.85; metalness: 0.0"
+            shadow="receive: true">
+        </a-plane>
+        
+        <a-box
+            id="coffer1"
+            position="-4.5 5.48 -4.5"
+            width="2.5"
+            height="0.04"
+            depth="2.5"
+            material="color: #1a1a1a; roughness: 0.9">
+        </a-box>
+        <a-box
+            id="coffer2"
+            position="4.5 5.48 -4.5"
+            width="2.5"
+            height="0.04"
+            depth="2.5"
+            material="color: #1a1a1a; roughness: 0.9">
+        </a-box>
+        <a-box
+            id="coffer3"
+            position="-4.5 5.48 4.5"
+            width="2.5"
+            height="0.04"
+            depth="2.5"
+            material="color: #1a1a1a; roughness: 0.9">
+        </a-box>
+        <a-box
+            id="coffer4"
+            position="4.5 5.48 4.5"
+            width="2.5"
+            height="0.04"
+            depth="2.5"
+            material="color: #1a1a1a; roughness: 0.9">
+        </a-box>
+        
+        <!-- LED lights -->
+        <a-cylinder
+            id="ceilingLight1"
+            position="-4.5 5.46 -4.5"
+            radius="0.12"
+            height="0.08"
+            rotation="0 0 0"
+            material="color: #FFF8E7; emissive: #FFF8E7; emissiveIntensity: 0.25">
+        </a-cylinder>
+        <a-cylinder
+            id="ceilingLight2"
+            position="4.5 5.46 -4.5"
+            radius="0.12"
+            height="0.08"
+            rotation="0 0 0"
+            material="color: #FFF8E7; emissive: #FFF8E7; emissiveIntensity: 0.25">
+        </a-cylinder>
+        <a-cylinder
+            id="ceilingLight3"
+            position="-4.5 5.46 4.5"
+            radius="0.12"
+            height="0.08"
+            rotation="0 0 0"
+            material="color: #FFF8E7; emissive: #FFF8E7; emissiveIntensity: 0.25">
+        </a-cylinder>
+        <a-cylinder
+            id="ceilingLight4"
+            position="4.5 5.46 4.5"
+            radius="0.12"
+            height="0.08"
+            rotation="0 0 0"
+            material="color: #FFF8E7; emissive: #FFF8E7; emissiveIntensity: 0.25">
+        </a-cylinder>
+        <a-cylinder
+            id="ceilingLight5"
+            position="0 5.46 0"
+            radius="0.12"
+            height="0.08"
+            rotation="0 0 0"
+            material="color: #FFF8E7; emissive: #FFF8E7; emissiveIntensity: 0.25">
+        </a-cylinder>
+
+        <!-- Framed Artwork 1 -->
+        <a-box 
+            id="frame1"
+            position="-5.5 2.5 -7.9"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+    
+        <a-box 
+            id="frame1Accent"
+            position="-5.5 2.5 -7.78"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+       
+        <a-box 
+            id="mat1"
+            position="-5.5 2.5 -7.77"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <!-- Artwork -->
+        <a-plane 
+            id="artwork1"
+            position="-5.5 2.5 -7.70"
+            width="1.35"
+            height="1.85"
+            material="src: #art1; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <!-- Elegant gallery label -->
+        <a-box
+            id="label1"
+            position="-5.5 1.15 -7.78"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label1Trim"
+            position="-5.5 1.15 -7.77"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <!-- Info panel text -->
+        <a-entity
+            id="info1"
+            position="-5.5 0.9 -7.75"
+            scale="1.4 1.4 1"
+            text="value: Duwende; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-5.5 0.78 -7.75"
+            scale="1.2 1.2 1"
+            text="value: ; width: 2.4; color: #222222; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-5.5 0.62 -7.75"
+            scale="0.95 0.95 1"
+            text="value: Tiny, dwarf-like guardians of nature in the Philippines, often found in mounds or trees. To avoid offending them, people say &quot;tabi-tabi po&quot; (excuse me).; width: 2.3; color: #222222; wrapCount: 46; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 2 -->
+        <a-box 
+            id="frame2"
+            position="0 2.5 -7.9"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box 
+            id="frame2Accent"
+            position="0 2.5 -7.78"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+       
+        <a-box 
+            id="mat2"
+            position="0 2.5 -7.77"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <!-- Artwork -->
+        <a-plane 
+            id="artwork2"
+            position="0 2.5 -7.70"
+            width="1.35"
+            height="1.85"
+            material="src: #art2; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <!-- Elegant gallery label-->
+        <a-box
+            id="label2"
+            position="0 1.15 -7.78"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label2Trim"
+            position="0 1.15 -7.77"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info2"
+            position="0 0.9 -7.75"
+            text="value: Kapre; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="0 0.78 -7.75"
+            text="value: : ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="0 0.62 -7.75"
+            scale="0.95 0.95 1"
+            text="value: A type of tree giant, known for dwelling in balete or mango trees. Mischievous yet protective, it plays tricks like making travelers lost and can become dangerous if angered, often accompanied by a strong tobacco smell.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 3 -->
+        <a-box 
+            id="frame3"
+            position="5.5 2.5 -7.9"
+            rotation="0 0 0"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+  
+        <a-box 
+            id="frame3Accent"
+            position="5.5 2.5 -7.78"
+            rotation="0 0 0"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+   
+        <a-box 
+            id="mat3"
+            position="5.5 2.5 -7.77"
+            rotation="0 0 0"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <!-- Artwork -->
+        <a-plane 
+            id="artwork3"
+            position="5.5 2.5 -7.70"
+            rotation="0 0 0"
+            width="1.35"
+            height="1.85"
+            material="src: #art3; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <!-- Elegant gallery label-->
+        <a-box
+            id="label3"
+            position="5.5 1.15 -7.78"
+            rotation="0 0 0"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label3Trim"
+            position="5.5 1.15 -7.77"
+            rotation="0 0 0"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info3"
+            position="5.5 0.9 -7.75"
+            text="value: Mananangal; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="5.5 0.78 -7.75"
+            text="value: ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="5.5 0.62 -7.75"
+            scale="0.95 0.95 1"
+            text="value: By night she separates from her lower body, hunting with bat-like wings and a hollow tongue. Folklore says salt or sunlight on the severed torso ends the horror.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 4 -->
+        <a-box 
+            id="frame4"
+            position="-7.9 2.5 -3.5"
+            rotation="0 90 0"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            scale="-1 1 1"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+    
+        <a-box 
+            id="frame4Accent"
+            position="-7.78 2.5 -3.5"
+            rotation="0 90 0"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            scale="-1 1 1"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+     
+        <a-box 
+            id="mat4"
+            position="-7.77 2.5 -3.5"
+            rotation="0 90 0"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            scale="-1 1 1"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <!-- Artwork -->
+        <a-plane 
+            id="artwork4"
+            position="-7.70 2.5 -3.5"
+            rotation="0 90 0"
+            width="1.35"
+            height="1.85"
+            scale="-1 1 1"
+            material="src: #art4; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <!-- Elegant gallery label-->
+        <a-box
+            id="label4"
+            position="-7.78 1.15 -3.5"
+            rotation="0 90 0"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            scale="-1 1 1"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label4Trim"
+            position="-7.77 1.15 -3.5"
+            rotation="0 90 0"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info4"
+            position="-7.78 0.9 -3.5"
+            rotation="0 90 0"
+            text="value: Serena; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-7.78 0.78 -3.5"
+            rotation="0 90 0"
+            text="value:  ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-7.78 0.62 -3.5"
+            rotation="0 90 0"
+            scale="0.95 0.95 1"
+            text="value: A type of enchanted siren, a singing spirit of rivers and seas whose voice is haunting yet calm. Sailors say her melodies can soothe storms—or lure those who disrespect the waters.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 5 -->
+        <a-box 
+            id="frame5"
+            position="-7.9 2.5 3.5"
+            rotation="0 90 0"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            scale="-1 1 1"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box 
+            id="frame5Accent"
+            position="-7.78 2.5 3.5"
+            rotation="0 90 0"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            scale="-1 1 1"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+        <a-box 
+            id="mat5"
+            position="-7.77 2.5 3.5"
+            rotation="0 90 0"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            scale="-1 1 1"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <a-plane 
+            id="artwork5"
+            position="-7.70 2.5 3.5"
+            rotation="0 90 0"
+            width="1.35"
+            height="1.85"
+            scale="-1 1 1"
+            material="src: #art5; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <a-box
+            id="label5"
+            position="-7.78 1.15 3.5"
+            rotation="0 90 0"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            scale="-1 1 1"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label5Trim"
+            position="-7.77 1.15 3.5"
+            rotation="0 90 0"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info5"
+            position="-7.78 0.9 3.5"
+            rotation="0 90 0"
+            text="value: Tikbalang; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-7.78 0.78 3.5"
+            rotation="0 90 0"
+            text="value: ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="-7.78 0.62 3.5"
+            rotation="0 90 0"
+            scale="0.95 0.95 1"
+            text="value: A type of terrifying, tall, horse-headed humanoid creature who leads travelers astray. Walk quietly and wear clothes inside out to break its pranks and find your path.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 6 -->
+        <a-box 
+            id="frame6"
+            position="7.9 2.5 -3.5"
+            rotation="0 -90 0"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box 
+            id="frame6Accent"
+            position="7.78 2.5 -3.5"
+            rotation="0 -90 0"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+        <a-box 
+            id="mat6"
+            position="7.77 2.5 -3.5"
+            rotation="0 -90 0"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <a-plane 
+            id="artwork6"
+            position="7.70 2.5 -3.5"
+            rotation="0 -90 0"
+            width="1.35"
+            height="1.85"
+            material="src: #art6; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <a-box
+            id="label6"
+            position="7.78 1.15 -3.5"
+            rotation="0 -90 0"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label6Trim"
+            position="7.77 1.15 -3.5"
+            rotation="0 -90 0"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info6"
+            position="7.78 0.9 -3.5"
+            rotation="0 -90 0"
+            text="value: Tiyanak; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="7.78 0.78 -3.5"
+            rotation="0 -90 0"
+            text="value: ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="7.78 0.62 -3.5"
+            rotation="0 -90 0"
+            scale="0.95 0.95 1"
+            text="value: A type of vengeful infant spirit, an unbaptized or aborted baby that lures victims with a crying sound, then transforms into a monstrous creature with fangs and claws to attack or lead them astray.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Framed Artwork 7 -->
+        <a-box 
+            id="frame7"
+            position="7.9 2.5 3.5"
+            rotation="0 -90 0"
+            width="1.7"
+            height="2.2"
+            depth="0.15"
+            material="color: #3D2817; roughness: 0.5; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box 
+            id="frame7Accent"
+            position="7.78 2.5 3.5"
+            rotation="0 -90 0"
+            width="1.65"
+            height="2.15"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9"
+            shadow="receive: false">
+        </a-box>
+        <a-box 
+            id="mat7"
+            position="7.77 2.5 3.5"
+            rotation="0 -90 0"
+            width="1.5"
+            height="2.0"
+            depth="0.02"
+            material="color: #F8F6F0; roughness: 0.95"
+            shadow="receive: true">
+        </a-box>
+        <a-plane 
+            id="artwork7"
+            position="7.70 2.5 3.5"
+            rotation="0 -90 0"
+            width="1.35"
+            height="1.85"
+            material="src: #art7; side: double; transparent: false"
+            shadow="receive: true">
+        </a-plane>
+        <a-box
+            id="label7"
+            position="7.78 1.15 3.5"
+            rotation="0 -90 0"
+            width="1.3"
+            height="0.18"
+            depth="0.025"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="label7Trim"
+            position="7.77 1.15 3.5"
+            rotation="0 -90 0"
+            width="1.32"
+            height="0.02"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="info7"
+            position="7.78 0.9 3.5"
+            rotation="0 -90 0"
+            text="value: White Lady; width: 2.4; color: #111111; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="7.78 0.78 3.5"
+            rotation="0 -90 0"
+            text="value: ; width: 2.4; color: #333333; wrapCount: 32; align: center">
+        </a-entity>
+        <a-entity
+            position="7.78 0.62 3.5"
+            rotation="0 -90 0"
+            scale="0.95 0.95 1"
+            text="value: A type of female ghost. Veiled figure drifting along lonely roads and hallways. Said to appear seeking justice or acknowledgment—offer respect and keep a calm distance.; width: 2.3; color: #333333; wrapCount: 40; align: center">
+        </a-entity>
+
+        <!-- Curved Poster Display -->
+        <a-curvedimage 
+            id="curvedPoster"
+            src="#poster"
+            radius="3"
+            theta-length="120"
+            height="2"
+            position="0 1.5 -3"
+            rotation="0 0 0"
+            material="side: double">
+        </a-curvedimage>
+        
+        <!-- poster base/stand -->
+        <a-cylinder
+            id="posterBase"
+            position="0 0.1 -3"
+            radius="0.25"
+            height="0.25"
+            material="color: #1a1a1a; roughness: 0.5; metalness: 0.2">
+        </a-cylinder>
+        <a-torus
+            id="posterBaseAccent"
+            position="0 0.22 -3"
+            rotation="90 0 0"
+            radius="0.25"
+            radius-tubular="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9">
+        </a-torus>
+        
+        <!-- plants near entrance -->
+        <a-cylinder
+            id="plantPot1"
+            position="-2 0.25 6.5"
+            radius="0.18"
+            height="0.6"
+            material="color: #1a1a1a; roughness: 0.4; metalness: 0.3">
+        </a-cylinder>
+        <a-torus
+            id="planterAccent1"
+            position="-2 0.55 6.5"
+            rotation="90 0 0"
+            radius="0.18"
+            radius-tubular="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9">
+        </a-torus>
+        <!-- Plant foliage -->
+        <a-sphere
+            id="plant1"
+            position="-2 1.0 6.5"
+            radius="0.28"
+            material="color: #2d5016; roughness: 0.9">
+        </a-sphere>
+        <a-sphere
+            id="plant1b"
+            position="-2 1.15 6.5"
+            radius="0.22"
+            material="color: #3d6b1f; roughness: 0.9">
+        </a-sphere>
+        
+        <a-cylinder
+            id="plantPot2"
+            position="2 0.25 6.5"
+            radius="0.18"
+            height="0.6"
+            material="color: #1a1a1a; roughness: 0.4; metalness: 0.3">
+        </a-cylinder>
+        <a-torus
+            id="planterAccent2"
+            position="2 0.55 6.5"
+            rotation="90 0 0"
+            radius="0.18"
+            radius-tubular="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9">
+        </a-torus>
+        <!-- Plant foliage -->
+        <a-sphere
+            id="plant2"
+            position="2 1.0 6.5"
+            radius="0.28"
+            material="color: #2d5016; roughness: 0.9">
+        </a-sphere>
+        <a-sphere
+            id="plant2b"
+            position="2 1.15 6.5"
+            radius="0.22"
+            material="color: #3d6b1f; roughness: 0.9">
+        </a-sphere>
+        
+        
+        <a-box
+            id="bench"
+            position="0 0.3 -1.5"
+            width="2.5"
+            height="0.5"
+            depth="0.5"
+            material="color: #1a1a1a; roughness: 0.4; metalness: 0.2"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box
+            id="benchSeat"
+            position="0 0.55 -1.5"
+            width="2.6"
+            height="0.12"
+            depth="0.6"
+            material="color: #2C2C2C; roughness: 0.3; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box
+            id="benchAccent"
+            position="0 0.61 -1.5"
+            width="2.65"
+            height="0.02"
+            depth="0.65"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <!-- Reception/Information Desk -->
+        <a-box
+            id="receptionDesk"
+            position="0 0.5 6"
+            width="3"
+            height="1"
+            depth="0.8"
+            material="color: #1a1a1a; roughness: 0.4; metalness: 0.2"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box
+            id="receptionTop"
+            position="0 1.05 6"
+            width="3.2"
+            height="0.1"
+            depth="0.9"
+            material="color: #2C2C2C; roughness: 0.2; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-box>
+        <a-box
+            id="receptionAccent"
+            position="0 1.11 6"
+            width="3.25"
+            height="0.02"
+            depth="0.95"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        
+        <!-- Elderly Woman (Witch) -->
+        <a-entity
+            id="witch"
+            gltf-model="#witchModel"
+            position="-1.8 0 6"
+            rotation="0 180 0"
+            scale="2.0 2.0 2.0"
+            animation__hunch="property: rotation; to: 0 180 -5; dur: 2000; easing: easeInOut; loop: true; dir: alternate">
+        
+            <a-light
+                type="point"
+                position="0 2.5 0"
+                color="#ffffff"
+                intensity="1.2"
+                distance="5"
+                decay="2">
+            </a-light>
+            <a-light
+                type="point"
+                position="0 1.5 0.5"
+                color="#ff6666"
+                intensity="0.6"
+                distance="4"
+                decay="2">
+            </a-light>
+        </a-entity>
+        
+        <a-entity
+            id="witchInstruction"
+            position="0.5 1.8 6"
+            rotation="0 180 0"
+            scale="0.5 0.5 0.5"
+            text="value: Click 'X' if you want to know more about Filipino mythology; width: 2.5; color: #ffffff; wrapCount: 30; align: left">
+        </a-entity>
+        <a-box
+            id="witchInstructionBg"
+            position="0.5 1.8 6.02"
+            rotation="0 180 0"
+            scale="0.5 0.5 0.5"
+            width="2.6"
+            height="0.3"
+            depth="0.03"
+            material="color: #000000; opacity: 0.6; transparent: true">
+        </a-box>
+        
+        <a-entity
+            id="witchText"
+            position="0 3.5 6"
+            rotation="0 0 0"
+            scale="0.7 0.7 0.7"
+            text="value: So you want to know more about Filipino mythology huh?; width: 3; color: #ffff00; wrapCount: 35; align: center; font: https://cdn.aframe.io/fonts/Exo2Bold.fnt"
+            animation__pulse="property: text.color; startEvents: pulse; to: #ffaa00; dur: 1000; easing: easeInOut; loop: true; dir: alternate">
+        </a-entity>
+        
+        <a-box
+            id="witchTextBg"
+            position="0 3.5 5.95"
+            rotation="0 0 0"
+            scale="0.7 0.7 0.7"
+            width="3.2"
+            height="0.5"
+            depth="0.05"
+            material="color: #000000; opacity: 0.8; transparent: true">
+        </a-box>
+        <a-box
+            id="witchTextBorder"
+            position="0 3.5 5.94"
+            rotation="0 0 0"
+            scale="0.7 0.7 0.7"
+            width="3.3"
+            height="0.02"
+            depth="0.01"
+            material="color: #ff0000; opacity: 0.9; transparent: true; emissive: #ff0000; emissiveIntensity: 0.3">
+        </a-box>
+        
+        <a-light
+            type="spot"
+            position="-1.8 5 6.5"
+            target="#witch"
+            angle="35"
+            penumbra="0.6"
+            color="#ffffff"
+            intensity="1.5"
+            distance="8"
+            decay="2"
+            id="witchSpotlight">
+        </a-light>
+        <a-light
+            type="spot"
+            position="-1.8 4.5 7"
+            target="#witch"
+            angle="40"
+            penumbra="0.7"
+            color="#ff8888"
+            intensity="0.8"
+            distance="6"
+            decay="2.5"
+            id="witchSpotlightRed">
+        </a-light>
+        
+    
+        <a-box
+            id="signBack"
+            position="0 3.5 6"
+            width="2.5"
+            height="0.8"
+            depth="0.1"
+            material="color: #1a1a1a; roughness: 0.5">
+        </a-box>
+        <a-box
+            id="signFront"
+            position="0 3.5 5.95"
+            width="2.4"
+            height="0.7"
+            depth="0.05"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="signAccent"
+            position="0 3.5 5.94"
+            width="2.45"
+            height="0.02"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <!-- Sound instructions plaque -->
+        <a-box
+            id="soundInfoBack"
+            position="0 2.6 6.05"
+            width="3.8"
+            height="0.9"
+            depth="0.05"
+            material="color: #f7f7f7; roughness: 0.9">
+        </a-box>
+        <a-box
+            id="soundInfoTrim"
+            position="0 2.6 6.08"
+            width="3.85"
+            height="0.04"
+            depth="0.01"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+        <a-entity
+            id="soundInstructions"
+            position="0 2.6 6.07"
+            text="value: Sounds: 1 Duwende | 2 Kapre | 3 Manananggal | 4 Serena | 5 Tikbalang | 6 Tiyanak | 7 White Lady | X Educational Rap | Background runs continuously.; width: 6.5; color: #1a1a1a; wrapCount: 90; align: center">
+        </a-entity>
+
+
+        <a-cylinder 
+            id="pedestalBase"
+            position="0 0.15 0"
+            radius="0.6"
+            height="0.35"
+            material="color: #1a1a1a; roughness: 0.3; metalness: 0.1"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+        <a-torus
+            id="pedestalAccent"
+            position="0 0.32 0"
+            rotation="90 0 0"
+            radius="0.6"
+            radius-tubular="0.02"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9">
+        </a-torus>
+        
+   
+        <a-cylinder 
+            id="sculptureBase"
+            position="0 0.6 0"
+            radius="0.35"
+            height="1.1"
+            material="color: #E8E8E8; roughness: 0.15; metalness: 0.85"
+            shadow="cast: true; receive: true">
+        </a-cylinder>
+   
+        <a-torus
+            id="sculptureRing"
+            position="0 0.6 0"
+            rotation="90 0 0"
+            radius="0.35"
+            radius-tubular="0.015"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.9">
+        </a-torus>
+
+        
+        <a-sphere 
+            id="sculptureTop"
+            position="0 1.75 0"
+            radius="0.45"
+            material="color: #D4AF37; roughness: 0.1; metalness: 0.95"
+            shadow="cast: true; receive: true">
+        </a-sphere>
+        
+   
+        <a-torus
+            id="barrier1"
+            position="0 0.05 0.85"
+            rotation="90 0 0"
+            radius="0.85"
+            radius-tubular="0.015"
+            arc="180"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-torus>
+        <a-torus
+            id="barrier2"
+            position="0 0.05 -0.85"
+            rotation="90 0 0"
+            radius="0.85"
+            radius-tubular="0.015"
+            arc="180"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-torus>
+        <a-torus
+            id="barrier3"
+            position="0.85 0.05 0"
+            rotation="0 0 90"
+            radius="0.85"
+            radius-tubular="0.015"
+            arc="180"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-torus>
+        <a-torus
+            id="barrier4"
+            position="-0.85 0.05 0"
+            rotation="0 0 90"
+            radius="0.85"
+            radius-tubular="0.015"
+            arc="180"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-torus>
+        
+        <a-cylinder
+            id="post1"
+            position="0.85 0.1 0.85"
+            radius="0.025"
+            height="0.25"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-cylinder>
+        <a-cylinder
+            id="post2"
+            position="-0.85 0.1 0.85"
+            radius="0.025"
+            height="0.25"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-cylinder>
+        <a-cylinder
+            id="post3"
+            position="0.85 0.1 -0.85"
+            radius="0.025"
+            height="0.25"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-cylinder>
+        <a-cylinder
+            id="post4"
+            position="-0.85 0.1 -0.85"
+            radius="0.025"
+            height="0.25"
+            material="color: #D4AF37; roughness: 0.3; metalness: 0.8">
+        </a-cylinder>
+        
+        <!-- Sculpture information plaque -->
+        <a-box
+            id="sculpturePlaque"
+            position="0 0.35 0.9"
+            width="0.6"
+            height="0.12"
+            depth="0.02"
+            material="color: #FFFFFF; roughness: 0.8">
+        </a-box>
+        <a-box
+            id="sculpturePlaqueAccent"
+            position="0 0.35 0.89"
+            width="0.62"
+            height="0.015"
+            depth="0.005"
+            material="color: #D4AF37; roughness: 0.2; metalness: 0.8">
+        </a-box>
+
+        <a-sky 
+            id="sky"
+            color="#F0F0EB"
+            radius="50">
+        </a-sky>
+
+        <a-entity 
+            id="camera"
+            camera 
+            look-controls 
+            wasd-controls 
+            position="0 1.6 6">
+        </a-entity>
+
+    </a-scene>
+
+    <script>
+        // Audio control: loop background, trigger creature sounds by key, stop previous creature sound.
+        window.addEventListener('DOMContentLoaded', () => {
+            const bg = document.getElementById('bgAudio');
+            const educationalRap = document.getElementById('educationalRap');
+            const sounds = {
+                '1': document.getElementById('duwendeSound'),
+                '2': document.getElementById('kapreSound'),
+                '3': document.getElementById('manananggalSound'),
+                '4': document.getElementById('serenaaSound'),
+                '5': document.getElementById('tikbalangSound'),
+                '6': document.getElementById('tiyanakSound'),
+                '7': document.getElementById('whiteladySound')
+            };
+
+            let currentCreatureSound = null;
+            let currentEducationalSound = null;
+
+            function ensureBackground() {
+                if (!bg) return;
+                bg.loop = true;
+                bg.volume = 0.35;
+                const tryPlay = () => bg.play().catch(() => {});
+                tryPlay();
+                // Fallback start on first interaction if autoplay is blocked.
+                const startOnce = () => {
+                    tryPlay();
+                    document.body.removeEventListener('click', startOnce);
+                    document.body.removeEventListener('keydown', startOnce);
+                };
+                document.body.addEventListener('click', startOnce);
+                document.body.addEventListener('keydown', startOnce);
+            }
+
+            ensureBackground();
+
+            window.addEventListener('keydown', (e) => {
+                const key = e.key.toLowerCase();
+                
+                // X key: Play educational rap song
+                if (key === 'x' || e.code === 'KeyX') {
+                    if (!educationalRap) return;
+                    
+                    // Keep background going
+                    ensureBackground();
+                    
+                    // Stop any currently playing creature sound
+                    if (currentCreatureSound) {
+                        currentCreatureSound.pause();
+                        currentCreatureSound.currentTime = 0;
+                        currentCreatureSound = null;
+                    }
+                    
+                    // Stop previous educational sound if playing
+                    if (currentEducationalSound && !educationalRap.paused) {
+                        educationalRap.pause();
+                        educationalRap.currentTime = 0;
+                    }
+                    
+                    // Play educational rap
+                    educationalRap.currentTime = 0;
+                    educationalRap.volume = 0.6;
+                    educationalRap.play().catch((err) => {
+                        console.error('Failed to play educational rap:', err);
+                    });
+                    currentEducationalSound = educationalRap;
+                    
+                    educationalRap.onended = () => {
+                        currentEducationalSound = null;
+                    };
+                    
+                    return;
+                }
+                
+                // Number keys: Play creature sounds
+                const sound = sounds[key];
+                if (!sound) return;
+
+                // Keep background going
+                ensureBackground();
+
+                // Stop educational sound if playing
+                if (currentEducationalSound && !educationalRap.paused) {
+                    educationalRap.pause();
+                    educationalRap.currentTime = 0;
+                    currentEducationalSound = null;
+                }
+
+                if (currentCreatureSound && currentCreatureSound !== sound) {
+                    currentCreatureSound.pause();
+                    currentCreatureSound.currentTime = 0;
+                }
+
+                sound.currentTime = 0;
+                sound.play().catch(() => {});
+                currentCreatureSound = sound;
+                sound.onended = () => {
+                    if (currentCreatureSound === sound) {
+                        currentCreatureSound = null;
+                    }
+                };
+            });
+        });
+    </script>
+    
+    <!-- Horror Visual Effects Script -->
+    <script>
+        (function() {
+            const scene = document.querySelector('a-scene');
+            if (!scene) return;
+            
+            scene.addEventListener('loaded', function() {
+                // Get all lights and artwork elements
+                const ambientLight = document.getElementById('ambientLight');
+                const mainDirectional = document.getElementById('mainDirectional');
+                const spotlights = [
+                    document.getElementById('spotlight1'),
+                    document.getElementById('spotlight2'),
+                    document.getElementById('spotlight3'),
+                    document.getElementById('spotlight4'),
+                    document.getElementById('spotlight5'),
+                    document.getElementById('spotlight6'),
+                    document.getElementById('spotlight7')
+                ];
+                const artworks = [
+                    document.getElementById('artwork1'),
+                    document.getElementById('artwork2'),
+                    document.getElementById('artwork3'),
+                    document.getElementById('artwork4'),
+                    document.getElementById('artwork5'),
+                    document.getElementById('artwork6'),
+                    document.getElementById('artwork7')
+                ];
+                const fog = scene.getAttribute('fog');
+                const camera = document.querySelector('[camera]');
+                
+                // Variable fog density in different areas (much darker, thicker fog)
+                let fogDensity = 0.035;
+                let fogTarget = 0.035;
+                const fogAreas = [
+                    { x: -5.5, z: -7.9, density: 0.06 },
+                    { x: 0, z: -7.9, density: 0.05 },
+                    { x: 5.5, z: -7.9, density: 0.065 },
+                    { x: -7.9, z: -3.5, density: 0.055 },
+                    { x: -7.9, z: 3.5, density: 0.052 },
+                    { x: 7.9, z: -3.5, density: 0.057 },
+                    { x: 7.9, z: 3.5, density: 0.053 }
+                ];
+                
+                // Flickering light system (darker flicker ranges)
+                function flickerLight(light, baseIntensity, minFlicker = 0.05, maxFlicker = null) {
+                    if (!light) return;
+                    const maxFlick = maxFlicker || (baseIntensity * 1.8);
+                    const flickerInterval = setInterval(() => {
+                        if (Math.random() < 0.18) { // 18% chance to flicker (more frequent)
+                            const flickerDuration = 50 + Math.random() * 200;
+                            const startTime = Date.now();
+                            const flickerLoop = () => {
+                                const elapsed = Date.now() - startTime;
+                                if (elapsed < flickerDuration) {
+                                    light.setAttribute('intensity', Math.random() * (maxFlick - minFlicker) + minFlicker);
+                                    requestAnimationFrame(flickerLoop);
+                                } else {
+                                    light.setAttribute('intensity', baseIntensity);
+                                }
+                            };
+                            flickerLoop();
+                        }
+                    }, 150 + Math.random() * 600);
+                }
+                
+                // Random spotlight toggling
+                function randomSpotlightToggle() {
+                    setInterval(() => {
+                        const spotlight = spotlights[Math.floor(Math.random() * spotlights.length)];
+                        if (spotlight && Math.random() < 0.3) {
+                            const currentIntensity = parseFloat(spotlight.getAttribute('intensity') || 0);
+                            if (currentIntensity > 0.1) {
+                                spotlight.setAttribute('intensity', 0.05);
+                                setTimeout(() => {
+                                    spotlight.setAttribute('intensity', currentIntensity);
+                                }, 200 + Math.random() * 800);
+                            }
+                        }
+                    }, 2000 + Math.random() * 3000);
+                }
+                
+                // Distorted creature visuals
+                function addCreatureDistortion() {
+                    artworks.forEach((artwork, index) => {
+                        if (!artwork) return;
+                        
+                        // Glowing eyes effect (for certain creatures)
+                        if (index === 2 || index === 5) { // Manananggal and Tiyanak
+                            setInterval(() => {
+                                if (Math.random() < 0.2) {
+                                    artwork.setAttribute('material', 'emissive: #ff0000; emissiveIntensity: 0.5');
+                                    setTimeout(() => {
+                                        artwork.setAttribute('material', 'emissive: #000000; emissiveIntensity: 0');
+                                    }, 100 + Math.random() * 200);
+                                }
+                            }, 3000 + Math.random() * 5000);
+                        }
+                        
+                        // Blur/distortion effect
+                        setInterval(() => {
+                            if (Math.random() < 0.15) {
+                                const currentScale = artwork.getAttribute('scale') || { x: 1, y: 1, z: 1 };
+                                artwork.setAttribute('scale', {
+                                    x: currentScale.x + (Math.random() - 0.5) * 0.05,
+                                    y: currentScale.y + (Math.random() - 0.5) * 0.05,
+                                    z: currentScale.z
+                                });
+                                setTimeout(() => {
+                                    artwork.setAttribute('scale', currentScale);
+                                }, 200);
+                            }
+                        }, 2000 + Math.random() * 4000);
+                        
+                        // Color shift
+                        setInterval(() => {
+                            if (Math.random() < 0.1) {
+                                const colors = ['#ff6666', '#66ff66', '#6666ff', '#ffff66'];
+                                const color = colors[Math.floor(Math.random() * colors.length)];
+                                artwork.setAttribute('material', `color: ${color}`);
+                                setTimeout(() => {
+                                    artwork.setAttribute('material', 'color: #ffffff');
+                                }, 300 + Math.random() * 500);
+                            }
+                        }, 4000 + Math.random() * 6000);
+                    });
+                }
+                
+                // Jump scare - creature moving across screen
+                function createJumpScare() {
+                    const jumpScareEntity = document.createElement('a-plane');
+                    jumpScareEntity.setAttribute('id', 'jumpScare');
+                    jumpScareEntity.setAttribute('width', '3');
+                    jumpScareEntity.setAttribute('height', '3');
+                    jumpScareEntity.setAttribute('position', '0 1.6 -0.5');
+                    jumpScareEntity.setAttribute('rotation', '0 0 0');
+                    jumpScareEntity.setAttribute('material', 'opacity: 0; transparent: true');
+                    jumpScareEntity.setAttribute('visible', 'false');
+                    scene.appendChild(jumpScareEntity);
+                    
+                    setInterval(() => {
+                        if (Math.random() < 0.08) { // 8% chance every interval
+                            const randomArtwork = artworks[Math.floor(Math.random() * artworks.length)];
+                            if (!randomArtwork) return;
+                            
+                            const artworkImg = randomArtwork.getAttribute('src');
+                            jumpScareEntity.setAttribute('material', `src: ${artworkImg}; opacity: 0.9; transparent: true`);
+                            jumpScareEntity.setAttribute('visible', 'true');
+                            
+                            // Quick movement animation
+                            let pos = -2;
+                            const speed = 0.15;
+                            const animate = () => {
+                                pos += speed;
+                                jumpScareEntity.setAttribute('position', `${pos} 1.6 -0.5`);
+                                if (pos < 2) {
+                                    requestAnimationFrame(animate);
+                                } else {
+                                    jumpScareEntity.setAttribute('visible', 'false');
+                                }
+                            };
+                            animate();
+                        }
+                    }, 8000 + Math.random() * 12000);
+                }
+                
+                // Visual glitches - screen distortion
+                function addVisualGlitches() {
+                    const glitchOverlay = document.createElement('a-plane');
+                    glitchOverlay.setAttribute('id', 'glitchOverlay');
+                    glitchOverlay.setAttribute('width', '20');
+                    glitchOverlay.setAttribute('height', '20');
+                    glitchOverlay.setAttribute('position', '0 1.6 -0.1');
+                    glitchOverlay.setAttribute('rotation', '0 0 0');
+                    glitchOverlay.setAttribute('material', 'color: #ff0000; opacity: 0; transparent: true');
+                    glitchOverlay.setAttribute('visible', 'false');
+                    scene.appendChild(glitchOverlay);
+                    
+                    // Screen flicker
+                    setInterval(() => {
+                        if (Math.random() < 0.12) {
+                            const bg = scene.getAttribute('background');
+                            scene.setAttribute('background', 'color: #000000');
+                            setTimeout(() => {
+                                scene.setAttribute('background', bg);
+                            }, 50 + Math.random() * 100);
+                        }
+                    }, 3000 + Math.random() * 7000);
+                    
+                    // Red flash glitch
+                    setInterval(() => {
+                        if (Math.random() < 0.1) {
+                            glitchOverlay.setAttribute('material', 'color: #ff0000; opacity: 0.3; transparent: true');
+                            glitchOverlay.setAttribute('visible', 'true');
+                            setTimeout(() => {
+                                glitchOverlay.setAttribute('visible', 'false');
+                            }, 100 + Math.random() * 200);
+                        }
+                    }, 5000 + Math.random() * 10000);
+                    
+                    // Camera shake/distortion
+                    if (camera) {
+                        setInterval(() => {
+                            if (Math.random() < 0.15) {
+                                const originalPos = camera.getAttribute('position');
+                                const shakeDuration = 200 + Math.random() * 300;
+                                const startTime = Date.now();
+                                const shake = () => {
+                                    const elapsed = Date.now() - startTime;
+                                    if (elapsed < shakeDuration) {
+                                        const offset = (Math.random() - 0.5) * 0.05;
+                                        camera.setAttribute('position', {
+                                            x: originalPos.x + offset,
+                                            y: originalPos.y + offset,
+                                            z: originalPos.z
+                                        });
+                                        requestAnimationFrame(shake);
+                                    } else {
+                                        camera.setAttribute('position', originalPos);
+                                    }
+                                };
+                                shake();
+                            }
+                        }, 4000 + Math.random() * 8000);
+                    }
+                }
+                
+                // Dynamic fog based on player position
+                function updateFogDensity() {
+                    if (!camera) return;
+                    const camPos = camera.getAttribute('position');
+                    if (!camPos) return;
+                    
+                    let nearestDensity = 0.015;
+                    let minDist = Infinity;
+                    
+                    fogAreas.forEach(area => {
+                        const dist = Math.sqrt(
+                            Math.pow(camPos.x - area.x, 2) + 
+                            Math.pow(camPos.z - area.z, 2)
+                        );
+                        if (dist < 3 && dist < minDist) {
+                            minDist = dist;
+                            nearestDensity = area.density;
+                        }
+                    });
+                    
+                    fogTarget = nearestDensity;
+                }
+                
+                // Smooth fog transition (thicker, more visible fog)
+                function animateFog() {
+                    if (Math.abs(fogDensity - fogTarget) > 0.001) {
+                        fogDensity += (fogTarget - fogDensity) * 0.05;
+                        scene.setAttribute('fog', `type: exponential; density: ${fogDensity.toFixed(4)}; color: #2a2a2a`);
+                    }
+                    requestAnimationFrame(animateFog);
+                }
+                
+                // Initialize all effects (very dark base values)
+                flickerLight(ambientLight, 0.05, 0.01, 0.1);
+                flickerLight(mainDirectional, 0.08, 0.02, 0.18);
+                spotlights.forEach((light, i) => {
+                    if (light) {
+                        const baseIntensity = parseFloat(light.getAttribute('intensity') || 0.55);
+                        flickerLight(light, baseIntensity, baseIntensity * 0.15, baseIntensity * 1.7);
+                    }
+                });
+                
+                randomSpotlightToggle();
+                addCreatureDistortion();
+                createJumpScare();
+                addVisualGlitches();
+                
+                // Update fog every frame
+                setInterval(updateFogDensity, 500);
+                animateFog();
+                
+                console.log('Horror effects initialized');
+            });
+        })();
+    </script>
+    
+    <!-- Witch Enhancement Script -->
+    <script>
+        (function() {
+            const scene = document.querySelector('a-scene');
+            if (!scene) return;
+            
+            scene.addEventListener('loaded', function() {
+                const witch = document.getElementById('witch');
+                const witchText = document.getElementById('witchText');
+                const witchSpotlight = document.getElementById('witchSpotlight');
+                
+                if (!witch) return;
+                
+                // Make witch look more eerie with subtle animations
+                setTimeout(() => {
+                    // Slight head movement (unsettling stare)
+                    if (witch) {
+                        setInterval(() => {
+                            if (Math.random() < 0.3) {
+                                const currentRot = witch.getAttribute('rotation') || { x: 0, y: 90, z: 0 };
+                                witch.setAttribute('animation__stare', 
+                                    `property: rotation; 
+                                     to: ${currentRot.x + (Math.random() - 0.5) * 5} ${currentRot.y + (Math.random() - 0.5) * 3} ${currentRot.z + (Math.random() - 0.5) * 2}; 
+                                     dur: 800; 
+                                     easing: easeInOut; 
+                                     loop: false`);
+                                setTimeout(() => {
+                                    witch.setAttribute('animation__stare', 
+                                        `property: rotation; 
+                                         to: ${currentRot.x} ${currentRot.y} ${currentRot.z}; 
+                                         dur: 800; 
+                                         easing: easeInOut; 
+                                         loop: false`);
+                                }, 800);
+                            }
+                        }, 3000 + Math.random() * 4000);
+                    }
+                }, 2000);
+                
+                // Text pulsing effect (yellow tones)
+                if (witchText) {
+                    setInterval(() => {
+                        const textComp = witchText.getAttribute('text');
+                        if (textComp) {
+                            const colors = ['#ffff00', '#ffaa00', '#ffcc00', '#ffee00'];
+                            const color = colors[Math.floor(Math.random() * colors.length)];
+                            witchText.setAttribute('text', 
+                                `value: ${textComp.value || 'So you want to know more about Filipino mythology huh?'}; 
+                                 width: 3; 
+                                 color: ${color}; 
+                                 wrapCount: 35; 
+                                 align: center; 
+                                 font: https://cdn.aframe.io/fonts/Exo2Bold.fnt`);
+                        }
+                    }, 2000);
+                }
+                
+                // Flickering spotlight on witch (subtle flicker, keeps visibility)
+                const witchSpotlightRed = document.getElementById('witchSpotlightRed');
+                if (witchSpotlight) {
+                    setInterval(() => {
+                        if (Math.random() < 0.15) {
+                            const currentIntensity = parseFloat(witchSpotlight.getAttribute('intensity') || 1.5);
+                            witchSpotlight.setAttribute('intensity', currentIntensity * 0.7);
+                            setTimeout(() => {
+                                witchSpotlight.setAttribute('intensity', currentIntensity);
+                            }, 100 + Math.random() * 200);
+                        }
+                    }, 2000 + Math.random() * 3000);
+                }
+                if (witchSpotlightRed) {
+                    setInterval(() => {
+                        if (Math.random() < 0.2) {
+                            const currentIntensity = parseFloat(witchSpotlightRed.getAttribute('intensity') || 0.8);
+                            witchSpotlightRed.setAttribute('intensity', currentIntensity * 0.5);
+                            setTimeout(() => {
+                                witchSpotlightRed.setAttribute('intensity', currentIntensity);
+                            }, 150 + Math.random() * 250);
+                        }
+                    }, 1800 + Math.random() * 2500);
+                }
+                
+                console.log('Witch enhancements initialized');
+            });
+        })();
+    </script>
+    
+    <script src="public/main.js"></script>
+</body>
+</html>
+
