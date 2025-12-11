@@ -1,32 +1,8 @@
 {
-  "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "index.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    },
-    {
-      "src": "/sound/(.*)",
-      "dest": "/sound/$1"
-    },
-    {
-      "src": "/public/(.*)",
-      "dest": "/public/$1"
-    },
-    {
-      "src": "/data/(.*)",
-      "dest": "/data/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/((?!\\.(jpg|jpeg|png|gif|svg|webp|mp3|wav|ogg|gltf|bin|json|js|css|woff|woff2|ttf|eot|ico)).*)",
+      "destination": "/index.html"
     }
   ]
 }
-
