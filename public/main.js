@@ -29,7 +29,7 @@
     const endpoints = [
       `${base}/api/creatures`,
       `${base}/data/creatures.json`,
-      "./data/creatures.json", // final fallback for flat/static hosting
+      "/data/creatures.json", // final fallback for static hosting
     ];
     for (const url of endpoints) {
       try {
